@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import chromadb
 import zhipuai
 
-from rag_demo import load_document, split_text
+from rag_demo import load_document, load_pdf, split_text
 
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(dotenv_path=BASE_DIR / ".env", override=True)
@@ -26,7 +26,7 @@ BATCH_SIZE = 20
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] %(message)s')
 
-    text = load_document(BASE_DIR / "test.txt")
+    text = load_pdf(BASE_DIR / "test_doc.pdf")
     chunks = split_text(text)
     logger.info(f"✅ 切分为 {len(chunks)} 个片段")
 

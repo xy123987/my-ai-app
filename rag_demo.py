@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+import pdfplumber
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # 仅获取 logger，不在模块级别调用 basicConfig，避免污染主程序日志配置
@@ -39,6 +40,26 @@ def split_text(text: str, chunk_size: int = 200, overlap: int = 40) -> list[str]
         separators=["\n\n", "\n", "。", "！", "？", "，", " ", ""],
     )
     return splitter.split_text(text)
+
+
+def load_pdf(file_path: str | Path) -> str:
+    """
+    读取本地 PDF 文件并提取全部文本
+
+    :param file_path: PDF 文件路径（支持字符串或 Path 对象）
+    :return: 所有页面拼接后的纯文本
+    :raises FileNotFoundError: 文件不存在时抛出
+    """
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"文件不存在: {path}")
+
+    try:
+        with pdfplumber.open(path) as pdf:
+            return "".join(page.extract_text() or "" for page in pdf.pages)
+    except Exception as e:
+        logger.error(f"解析 PDF 失败: {path}, 错误: {e}")
+        return ""
 
 
 if __name__ == "__main__":
